@@ -1,0 +1,146 @@
+openapi: 3.0.1
+info:
+  title: Kafka API
+  description: API для работы с Kafka и отчетами
+  version: 1.0.0
+
+paths:
+  /kafka/tast/{topic-id}:
+    post:
+      summary: "Отправить сообщение в Kafka топик"
+      parameters:
+        - in: path
+          name: topic-id
+          required: true
+          schema:
+            type: string
+          description: Идентификатор Kafka топика
+      requestBody:
+        description: Сообщение для отправки
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  description: Сообщение для отправки в топик
+              required:
+                - message
+      responses:
+        '200':
+          description: Сообщение успешно отправлено в топик
+        '400':
+          description: Неверный запрос
+
+  /employees:
+    get:
+      summary: "Получить список идентификаторов сотрудников"
+      responses:
+        '200':
+          description: Список сотрудников
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+
+  /employees/{id}:
+    get:
+      summary: "Получить информацию о сотруднике"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Идентификатор сотрудника
+      responses:
+        '200':
+          description: Информация о сотруднике
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  position:
+                    type: string
+                    enum:
+                      - "Developer"
+                      - "Manager"
+                      - "Tester"
+                  total_hours:
+                    type: integer
+        '404':
+          description: Сотрудник не найден
+
+  /reports:
+    get:
+      summary: "Получить список кратких описаний отчетов"
+      responses:
+        '200':
+          description: Список отчетов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    start_date:
+                      type: string
+                      format: date
+                    end_date:
+                      type: string
+                      format: date
+
+  /reports/{id}:
+    get:
+      summary: "Получить конкретный отчет"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: currency
+          schema:
+            type: string
+            default: "RUB"
+          description: Валюта для отчета
+      responses:
+        '200':
+          description: Информация о конкретном отчете
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  total_amount:
+                    type: number
+                    format: float
+                  currency:
+                    type: string
+
+  /reports/{id}/refresh:
+    patch:
+      summary: "Пересоздать отчет"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Отчет успешно пересоздан
+        '400':
+          description: Ошибка при пересоздании отчета
